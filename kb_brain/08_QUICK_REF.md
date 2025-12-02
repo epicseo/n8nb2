@@ -332,3 +332,20 @@
 | Configuration | [[05_CONFIG]] |
 | Debugging | [[06_DEBUG]] |
 | Examples | [[07_EXAMPLES]] |
+| Error Reference (135+ errors) | [[09_ERROR_REFERENCE]] |
+| Frontend Stores (19 stores) | [[10_FRONTEND_STORES]] |
+| Workflow Types (100+ types) | [[11_WORKFLOW_TYPES]] |
+
+---
+
+## KB Statistics
+
+| Metric | Count |
+|--------|-------|
+| Total KB Files | 11 |
+| Error Classes Documented | 135+ |
+| API Types Documented | 200+ |
+| Workflow Types Documented | 100+ |
+| Pinia Stores Documented | 19 |
+| Store Actions Documented | 400+ |
+| RAG Chunks | 500+ |
