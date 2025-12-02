@@ -1,531 +1,432 @@
 # 02_CORE_API.md
-<!-- repo: n8n | branch: claude/github-to-kb-converter-01JAurUearApTk4RAu9NPFAg | commit: 3c0e809e | generated: 2025-11-28 -->
-<!-- tags: api, functions, controllers, services, core -->
+<!-- repo: n8n | version: 1.122.0 | generated: 2025-12-02 -->
+<!-- tags: api, types, interfaces, database, entities -->
 
 ## Contents
-- [CLI Controllers](#cli-controllers)
-- [CLI Services](#cli-services)
-- [Core Package APIs](#core-package-apis)
-- [Workflow Package APIs](#workflow-package-apis)
+- [REST API Controllers](#rest-api-controllers)
+- [Core Services](#core-services)
+- [Database Entities](#database-entities)
+- [Core Interfaces](#core-interfaces)
+- [Execution Types](#execution-types)
+- [Connection Types](#connection-types)
 
 ---
 
-## CLI Controllers
-<!-- chunk: 02-controllers | keywords: controller, rest, http, endpoint | source: packages/cli/src/controllers/ -->
+## REST API Controllers
+<!-- chunk: 02-controllers | keywords: controller, rest, http, endpoint -->
 
-### Authentication Controller
-**File:** `packages/cli/src/controllers/auth.controller.ts`
-**Base Path:** `/`
+### Authentication (`/`)
 
-#### `POST /login`
-<!-- chunk: 02-login | keywords: login, authenticate, auth -->
-```typescript
-login(req: AuthenticatedRequest, res: Response, payload: LoginRequestDto): Promise<PublicUser | undefined>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| emailOrLdapLoginId | string | Yes | Email or LDAP login |
-| password | string | Yes | User password |
-| mfaCode | string | No | MFA code if enabled |
-| mfaRecoveryCode | string | No | Recovery code alternative |
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/login` | Authenticate user |
+| GET | `/login` | Get current user |
+| POST | `/logout` | End session |
 
-Returns: `PublicUser` — Authenticated user object
-Raises: `AuthError` — Invalid credentials
+### Users (`/users`)
 
-#### `GET /login`
-```typescript
-currentUser(req: AuthenticatedRequest): Promise<PublicUser>
-```
-Returns: `PublicUser` — Currently authenticated user
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/` | List users |
+| DELETE | `/:id` | Delete user |
+| PATCH | `/:id/role` | Change role |
 
-#### `POST /logout`
-```typescript
-logout(req: AuthenticatedRequest, res: Response): Promise<{ loggedOut: boolean }>
-```
-Returns: `{ loggedOut: true }` — Logout confirmation
+### Workflows (`/workflows`)
 
----
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/` | List workflows |
+| POST | `/` | Create workflow |
+| PATCH | `/:id` | Update workflow |
+| POST | `/:id/run` | Execute workflow |
 
-### Users Controller
-**File:** `packages/cli/src/controllers/users.controller.ts`
-**Base Path:** `/users`
+### Credentials (`/credentials`)
 
-#### `GET /`
-<!-- chunk: 02-users-list | keywords: users, list, filter -->
-```typescript
-listUsers(req: AuthenticatedRequest, query: UsersListFilterDto): Promise<{ data: PublicUser[], count: number }>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| limit | number | No | Results per page |
-| cursor | string | No | Pagination cursor |
-| includeRole | boolean | No | Include user roles |
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/` | List credentials |
+| POST | `/` | Create credential |
+| POST | `/test` | Test credential |
+| DELETE | `/:id` | Delete credential |
 
-Returns: Paginated list of users
-Scope: `user:list`
+### Executions (`/executions`)
 
-#### `DELETE /:id`
-```typescript
-deleteUser(req: AuthenticatedRequest, params: { id: string }, query: { transferId?: string }): Promise<{ success: boolean }>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| id | string | Yes | User ID to delete |
-| transferId | string | No | Project to transfer resources |
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/` | List executions |
+| GET | `/:id` | Get execution |
+| DELETE | `/:id` | Delete execution |
+| POST | `/:id/retry` | Retry execution |
 
-Returns: `{ success: true }`
-Scope: `user:delete`
+### AI (`/ai`)
 
-#### `PATCH /:id/role`
-```typescript
-changeGlobalRole(req: AuthenticatedRequest, res: Response, payload: RoleChangeRequestDto, id: string): Promise<{ success: boolean }>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| id | string | Yes | Target user ID |
-| newRoleName | string | Yes | New role (global:admin, global:member) |
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/build` | AI workflow builder |
+| POST | `/chat` | AI chat |
+| POST | `/ask` | AI question |
 
-Scope: `user:changeRole`
-License: `feat:advancedPermissions`
+### Health
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/healthz` | Liveness check |
+| GET | `/healthz/readiness` | Readiness check |
 
 ---
 
-### Credentials Controller
-**File:** `packages/cli/src/credentials/credentials.controller.ts`
-**Base Path:** `/credentials`
-
-#### `GET /`
-<!-- chunk: 02-credentials-list | keywords: credentials, list -->
-```typescript
-getMany(req: AuthenticatedRequest, query: CredentialsGetManyRequestQuery): Promise<CredentialWithScopesAndData[]>
-```
-| Param | Type | Purpose |
-|-------|------|---------|
-| includeScopes | boolean | Include permission scopes |
-| includeData | boolean | Include decrypted data |
-| onlySharedWithMe | boolean | Filter to shared only |
-
-#### `POST /`
-```typescript
-createCredential(req: AuthenticatedRequest, payload: CreateCredentialDto): Promise<CredentialsEntity>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| name | string | Yes | Credential name |
-| type | string | Yes | Credential type |
-| data | object | Yes | Credential data |
-
-#### `POST /test`
-```typescript
-testCredentials(req: AuthenticatedRequest, payload: ICredentialsDecrypted): Promise<INodeCredentialTestResult>
-```
-Returns: `{ status: 'OK' | 'Error', message?: string }`
-
-#### `DELETE /:credentialId`
-```typescript
-deleteCredential(req: AuthenticatedRequest, params: { credentialId: string }): Promise<{ success: boolean }>
-```
-Scope: `credential:delete`
-
----
-
-### Workflows Controller
-**File:** `packages/cli/src/workflows/workflows.controller.ts`
-**Base Path:** `/workflows`
-
-#### `GET /`
-<!-- chunk: 02-workflows-list | keywords: workflows, list -->
-```typescript
-getMany(req: ListQuery.Request, res: Response): Promise<PaginatedResponse<WorkflowEntity>>
-```
-
-#### `POST /`
-```typescript
-create(req: AuthenticatedRequest, payload: CreateWorkflowDto): Promise<WorkflowEntity>
-```
-| Param | Type | Required | Purpose |
-|-------|------|----------|---------|
-| name | string | Yes | Workflow name |
-| nodes | INode[] | Yes | Workflow nodes |
-| connections | IConnections | Yes | Node connections |
-| settings | IWorkflowSettings | No | Workflow settings |
-
-#### `PATCH /:workflowId`
-```typescript
-update(req: AuthenticatedRequest, params: { workflowId: string }, payload: UpdateWorkflowDto): Promise<WorkflowEntity>
-```
-Scope: `workflow:update`
-
-#### `POST /:workflowId/run`
-```typescript
-runManually(req: AuthenticatedRequest, params: { workflowId: string }, payload: ManualRunPayload): Promise<IExecutionResponse>
-```
-Starts manual workflow execution.
-
----
-
-### AI Controller
-**File:** `packages/cli/src/controllers/ai.controller.ts`
-**Base Path:** `/ai`
-
-#### `POST /build`
-<!-- chunk: 02-ai-build | keywords: ai, builder, workflow -->
-```typescript
-buildWorkflow(req: AuthenticatedRequest, res: Response, payload: AiBuilderChatRequestDto): Promise<StreamingResponse>
-```
-License: `feat:aiBuilder`
-Returns: Streaming response with workflow suggestions
-
-#### `POST /chat`
-```typescript
-chat(req: AuthenticatedRequest, res: Response, payload: AiChatRequestDto): Promise<StreamingResponse>
-```
-License: `feat:aiBuilder`
-
-#### `POST /ask`
-```typescript
-ask(req: AuthenticatedRequest, payload: AiAskRequestDto): Promise<AiResponse>
-```
-
----
-
-### Node Types Controller
-**File:** `packages/cli/src/controllers/node-types.controller.ts`
-**Base Path:** `/node-types`
-
-#### `POST /`
-<!-- chunk: 02-node-types | keywords: nodes, types, description -->
-```typescript
-getNodeInfo(req: AuthenticatedRequest, payload: { nodeInfos: INodeTypeNameVersion[] }): Promise<INodeTypeDescription[]>
-```
-Returns node type descriptions with translations.
-
----
-
-### Additional Controller Endpoints
-
-| Controller | Base Path | Key Endpoints |
-|------------|-----------|---------------|
-| Active Workflows | `/active-workflows` | GET /, POST /activate, POST /deactivate |
-| API Keys | `/api-keys` | GET /, POST /, DELETE /:id |
-| Executions | `/executions` | GET /, GET /:id, DELETE /:id, POST /:id/retry |
-| Projects | `/projects` | GET /, POST /, PATCH /:id, DELETE /:id |
-| Tags | `/tags` | GET /, POST /, PATCH /:id, DELETE /:id |
-| Me | `/me` | GET /, PATCH /, PATCH /password, POST /survey |
-| MFA | `/mfa` | POST /enable, POST /disable, POST /verify |
-| Owner | `/owner` | POST /setup, POST /dismiss-banner |
-| Settings | `/settings` | GET / |
-
----
-
-## CLI Services
-<!-- chunk: 02-services | keywords: service, business-logic | source: packages/cli/src/services/ -->
+## Core Services
+<!-- chunk: 02-services | keywords: service, business-logic -->
 
 ### UserService
-**File:** `packages/cli/src/services/user.service.ts`
 
-#### `update`
 ```typescript
-async update(userId: string, data: Partial<User>): Promise<void>
+update(userId: string, data: Partial<User>): Promise<void>
+toPublic(user: User, options?: ToPublicOptions): Promise<PublicUser>
+inviteUsers(owner: User, invitations: Invitation[]): Promise<void>
 ```
-Updates user record with partial data.
-
-#### `updateSettings`
-```typescript
-async updateSettings(userId: string, newSettings: Partial<IUserSettings>): Promise<void>
-```
-Updates user preferences (timezone, etc.).
-
-#### `toPublic`
-```typescript
-async toPublic(user: User, options?: ToPublicOptions): Promise<PublicUser>
-```
-| Param | Type | Purpose |
-|-------|------|---------|
-| withInviteUrl | boolean | Generate invite URL |
-| inviterId | string | Inviter for invite URL |
-| withScopes | boolean | Include permission scopes |
-
-#### `inviteUsers`
-```typescript
-async inviteUsers(owner: User, invitations: Invitation[]): Promise<void>
-```
-Sends invitation emails to new users.
-
----
 
 ### CredentialsService
-**File:** `packages/cli/src/credentials/credentials.service.ts`
 
-#### `getMany`
 ```typescript
-async getMany(user: User, options: GetManyOptions): Promise<ICredentialDataDecryptedObject[]>
-```
-| Option | Type | Purpose |
-|--------|------|---------|
-| listQueryOptions | ListQueryOptions | Pagination/filtering |
-| includeScopes | boolean | Include permissions |
-| includeData | boolean | Include decrypted data |
-
-#### `getOne`
-```typescript
-async getOne(user: User, credentialId: string, includeData?: boolean): Promise<ICredentialDataDecryptedObject>
-```
-
-#### `test`
-```typescript
-async test(userId: string, credentials: ICredentialsDecrypted): Promise<INodeCredentialTestResult>
-```
-
-#### `decrypt`
-```typescript
+getMany(user: User, options: GetManyOptions): Promise<ICredentialDataDecryptedObject[]>
+test(userId: string, credentials: ICredentialsDecrypted): Promise<INodeCredentialTestResult>
 decrypt(credential: Credential, fullData?: boolean): ICredentialDataDecryptedObject
 ```
 
----
-
 ### WorkflowService
-**File:** `packages/cli/src/workflows/workflow.service.ts`
 
-#### Key Methods
-| Method | Signature | Purpose |
-|--------|-----------|---------|
-| `get` | `(id: string, relations?: string[]): Promise<WorkflowEntity>` | Get workflow by ID |
-| `create` | `(workflow: WorkflowEntity, user: User): Promise<WorkflowEntity>` | Create new workflow |
-| `update` | `(id: string, workflow: Partial<WorkflowEntity>): Promise<WorkflowEntity>` | Update workflow |
-| `delete` | `(id: string): Promise<void>` | Delete workflow |
-| `activate` | `(id: string): Promise<void>` | Activate workflow |
-| `deactivate` | `(id: string): Promise<void>` | Deactivate workflow |
-
----
+```typescript
+get(id: string, relations?: string[]): Promise<WorkflowEntity>
+create(workflow: WorkflowEntity, user: User): Promise<WorkflowEntity>
+update(id: string, workflow: Partial<WorkflowEntity>): Promise<WorkflowEntity>
+delete(id: string): Promise<void>
+activate(id: string): Promise<void>
+deactivate(id: string): Promise<void>
+```
 
 ### ExecutionService
-**File:** `packages/cli/src/executions/execution.service.ts`
 
-#### `getExecutions`
 ```typescript
-async getExecutions(filter: IGetExecutionsQueryFilter): Promise<ExecutionSummaries>
-```
-
-#### `stopExecution`
-```typescript
-async stopExecution(executionId: string): Promise<StopResult>
+getExecutions(filter: IGetExecutionsQueryFilter): Promise<ExecutionSummaries>
+stopExecution(executionId: string): Promise<StopResult>
 ```
 
 ---
 
-## Core Package APIs
-<!-- chunk: 02-core | keywords: core, execution, engine | source: packages/core/src/ -->
+## Database Entities
+<!-- chunk: 02-entities | keywords: entity, typeorm, database -->
 
-### WorkflowExecute
-**File:** `packages/core/src/execution-engine/workflow-execute.ts`
+### WorkflowEntity
 
-#### `constructor`
-```typescript
-constructor(
-  additionalData: IWorkflowExecuteAdditionalData,
-  mode: WorkflowExecuteMode,
-  runExecutionData?: IRunExecutionData
-)
-```
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | string | Nano-id PK |
+| name | string | Display name (1-128 chars) |
+| active | boolean | Activation status |
+| nodes | INode[] | Node definitions (JSON) |
+| connections | IConnections | Node connections (JSON) |
+| settings | IWorkflowSettings | Workflow settings (JSON) |
+| staticData | IDataObject | Persistent data (JSON) |
+| pinData | ISimplifiedPinData | Pinned test data |
 
-#### `run`
-<!-- chunk: 02-workflow-run | keywords: execute, run, workflow -->
-```typescript
-run(
-  workflow: Workflow,
-  startNode?: INode,
-  destinationNode?: IDestinationNode,
-  pinData?: IPinData,
-  triggerToStartFrom?: TriggerInfo
-): PCancelable<IRun>
-```
-| Param | Type | Purpose |
-|-------|------|---------|
-| workflow | Workflow | Workflow to execute |
-| startNode | INode | Optional start node |
-| destinationNode | IDestinationNode | Target node for partial execution |
-| pinData | IPinData | Pinned node data |
+### ExecutionEntity
 
-Returns: Cancellable promise resolving to `IRun`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | string | Auto-generated PK |
+| mode | WorkflowExecuteMode | Execution mode |
+| status | ExecutionStatus | Current status |
+| workflowId | string | Reference to workflow |
+| startedAt | Date | Start timestamp |
+| stoppedAt | Date | Stop timestamp |
+| waitTill | Date | Wait-until timestamp |
 
-#### `runPartialWorkflow2`
-```typescript
-runPartialWorkflow2(
-  workflow: Workflow,
-  runData: IRunData,
-  pinData?: IPinData,
-  dirtyNodeNames?: string[],
-  destinationNode?: IDestinationNode,
-  agentRequest?: AiAgentRequest
-): PCancelable<IRun>
-```
-Execute partial workflow from specific nodes.
+### CredentialsEntity
 
-#### Properties
-| Property | Type | Purpose |
-|----------|------|---------|
-| `status` | ExecutionStatus | Current execution status |
-| `timedOut` | boolean | Whether execution timed out |
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | string | Nano-id PK |
+| name | string | Credential name (3-128 chars) |
+| type | string | Credential type |
+| data | string | Encrypted data |
+
+### User
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | string | UUID PK |
+| email | string | Unique email |
+| password | string | Hashed password |
+| mfaEnabled | boolean | 2FA status |
+
+### Project
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | string | Nano-id PK |
+| name | string | Project name |
+| type | string | 'personal' or 'team' |
+
+### SharedWorkflow / SharedCredentials
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| workflowId/credentialsId | string | Resource FK |
+| projectId | string | Project FK |
+| role | string | Permission level |
 
 ---
 
-### ExecuteContext
-**File:** `packages/core/src/execution-engine/node-execution-context/execute-context.ts`
+## Core Interfaces
+<!-- chunk: 02-interfaces | keywords: interface, types, typescript -->
 
-#### `helpers` Object
-<!-- chunk: 02-execute-helpers | keywords: helpers, node, context -->
+### INode
 ```typescript
-readonly helpers: {
-  // Data helpers
-  returnJsonArray(values: unknown[]): INodeExecutionData[];
-  copyInputItems(inputs: INodeExecutionData[], props: string[]): INodeExecutionData[];
-  normalizeItems(items: unknown[]): INodeExecutionData[];
-
-  // Request helpers
-  request(options: RequestOptions): Promise<any>;
-  requestWithAuthentication(credType: string, options: RequestOptions): Promise<any>;
-
-  // Binary helpers
-  assertBinaryData(itemIndex: number, propertyName: string): void;
-  getBinaryDataBuffer(itemIndex: number, propertyName: string): Promise<Buffer>;
-  copyBinaryFile(filePath: string, fileName: string, mimeType?: string): Promise<string>;
-
-  // Scheduling helpers
-  registerCron(cronDef: ICronDefinition, onTick: () => void): void;
-
-  // Promise helpers
-  createDeferredPromise(): DeferredPromise<unknown>;
+interface INode {
+  id: string;
+  name: string;
+  type: string;                    // e.g., "n8n-nodes-base.slack"
+  typeVersion: number;
+  position: [number, number];      // [x, y] coordinates
+  disabled?: boolean;
+  parameters: INodeParameters;
+  credentials?: INodeCredentials;
+  // Error handling
+  continueOnFail?: boolean;
+  retryOnFail?: boolean;
+  maxTries?: number;
+  onError?: 'continueErrorOutput' | 'continueRegularOutput' | 'stopWorkflow';
 }
 ```
 
-#### `getNodeParameter`
+### INodeType
 ```typescript
-getNodeParameter(
-  parameterName: string,
-  itemIndex: number,
-  fallbackValue?: unknown,
-  options?: IGetNodeParameterOptions
-): NodeParameterValue
+interface INodeType {
+  description: INodeTypeDescription;
+  execute?(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
+  trigger?(this: ITriggerFunctions): Promise<ITriggerResponse | undefined>;
+  webhook?(this: IWebhookFunctions): Promise<IWebhookResponseData>;
+  poll?(this: IPollFunctions): Promise<INodeExecutionData[][] | null>;
+  methods?: {
+    loadOptions?: Record<string, (this: ILoadOptionsFunctions) => Promise<INodePropertyOptions[]>>;
+    credentialTest?: Record<string, ICredentialTestFunction>;
+  };
+}
 ```
 
-#### `getCredentials`
+### INodeExecutionData
 ```typescript
-async getCredentials<T extends object>(type: string): Promise<T>
+interface INodeExecutionData {
+  json: IDataObject;                 // Primary JSON data
+  binary?: IBinaryKeyData;           // Binary files
+  error?: NodeError;                 // Error info
+  pairedItem?: IPairedItemData;      // Source tracking
+}
 ```
 
-#### `getInputData`
+### IWorkflowBase
 ```typescript
-getInputData(inputIndex?: number, connectionType?: string): INodeExecutionData[]
+interface IWorkflowBase {
+  id: string;
+  name: string;
+  active: boolean;
+  nodes: INode[];
+  connections: IConnections;
+  settings?: IWorkflowSettings;
+  staticData?: IDataObject;
+  pinData?: IPinData;
+}
+```
+
+### IWorkflowSettings
+```typescript
+interface IWorkflowSettings {
+  timezone?: string;
+  errorWorkflow?: string;
+  executionTimeout?: number;
+  saveDataErrorExecution?: 'all' | 'none';
+  saveDataSuccessExecution?: 'all' | 'none';
+  saveManualExecutions?: boolean;
+  executionOrder?: 'v0' | 'v1';
+}
+```
+
+### IConnections
+```typescript
+interface IConnections {
+  [sourceNodeName: string]: {
+    [connectionType: string]: IConnection[][];
+  };
+}
+
+interface IConnection {
+  node: string;           // Target node name
+  type: NodeConnectionType;
+  index: number;          // Input index
+}
 ```
 
 ---
 
-### TriggerContext
-**File:** `packages/core/src/execution-engine/node-execution-context/trigger-context.ts`
+## Execution Types
+<!-- chunk: 02-execution | keywords: execution, run, status -->
 
-#### `emit`
-```typescript
-readonly emit: (data: INodeExecutionData[][]) => void
-```
-Emit execution data from trigger.
+### WorkflowExecute Class
 
-#### `emitError`
 ```typescript
-readonly emitError: (error: Error) => void
+class WorkflowExecute {
+  constructor(
+    additionalData: IWorkflowExecuteAdditionalData,
+    mode: WorkflowExecuteMode,
+    runExecutionData?: IRunExecutionData
+  );
+
+  run(
+    workflow: Workflow,
+    startNode?: INode,
+    destinationNode?: IDestinationNode,
+    pinData?: IPinData
+  ): PCancelable<IRun>;
+
+  runPartialWorkflow2(
+    workflow: Workflow,
+    runData: IRunData,
+    pinData?: IPinData,
+    dirtyNodeNames?: string[]
+  ): PCancelable<IRun>;
+}
 ```
 
-#### `getActivationMode`
+### ExecuteContext Helpers
+
 ```typescript
-getActivationMode(): WorkflowActivateMode
+interface ExecuteHelpers {
+  // Data
+  returnJsonArray(values: unknown[]): INodeExecutionData[];
+  normalizeItems(items: unknown[]): INodeExecutionData[];
+
+  // Requests
+  request(options: RequestOptions): Promise<any>;
+  requestWithAuthentication(credType: string, options: RequestOptions): Promise<any>;
+
+  // Binary
+  assertBinaryData(itemIndex: number, propertyName: string): void;
+  getBinaryDataBuffer(itemIndex: number, propertyName: string): Promise<Buffer>;
+  prepareBinaryData(buffer: Buffer, fileName?: string, mimeType?: string): Promise<IBinaryData>;
+}
 ```
-Returns: `'init'` | `'create'` | `'update'` | `'activate'` | `'manual'`
+
+### IRun
+```typescript
+interface IRun {
+  data: IRunExecutionData;
+  finished?: boolean;
+  mode: WorkflowExecuteMode;
+  startedAt: Date;
+  stoppedAt?: Date;
+  status: ExecutionStatus;
+  waitTill?: Date | null;
+}
+```
+
+### ExecutionStatus
+```typescript
+type ExecutionStatus =
+  | 'canceled' | 'crashed' | 'error'
+  | 'new' | 'running' | 'success'
+  | 'unknown' | 'waiting';
+```
+
+### WorkflowExecuteMode
+```typescript
+type WorkflowExecuteMode =
+  | 'cli' | 'error' | 'integrated' | 'internal'
+  | 'manual' | 'retry' | 'trigger' | 'webhook'
+  | 'evaluation' | 'chat';
+```
 
 ---
 
-### PollContext
-**File:** `packages/core/src/execution-engine/node-execution-context/poll-context.ts`
+## Connection Types
+<!-- chunk: 02-connections | keywords: connection, types, ai -->
 
-Same interface as TriggerContext with `__emit` and `__emitError` methods.
+### NodeConnectionTypes
 
----
+| Type | Purpose |
+|------|---------|
+| `main` | Standard data flow |
+| `ai_languageModel` | LLM provider (max 1) |
+| `ai_memory` | Conversation history (max 1) |
+| `ai_tool` | Agent tools (many) |
+| `ai_vectorStore` | Vector database (max 1) |
+| `ai_embedding` | Embedding model |
+| `ai_retriever` | Document retriever |
+| `ai_outputParser` | Output parser |
+| `ai_textSplitter` | Text splitter |
+| `ai_document` | Document loader |
+| `ai_agent` | Sub-agent |
+| `ai_chain` | LangChain chain |
+| `ai_reranker` | Reranker model |
 
-## Workflow Package APIs
-<!-- chunk: 02-workflow | keywords: workflow, class, types | source: packages/workflow/src/ -->
+### Property Types
 
-### Workflow Class
-**File:** `packages/workflow/src/workflow.ts`
-
-#### Constructor
 ```typescript
-constructor(parameters: WorkflowParameters)
+type NodePropertyTypes =
+  | 'boolean' | 'number' | 'string'
+  | 'options' | 'multiOptions' | 'collection'
+  | 'fixedCollection' | 'json' | 'color'
+  | 'dateTime' | 'filter' | 'hidden'
+  | 'resourceLocator' | 'resourceMapper'
+  | 'credentialsSelect' | 'workflowSelector'
+  | 'assignment' | 'assignmentCollection';
 ```
 
-#### Node Methods
-| Method | Signature | Purpose |
-|--------|-----------|---------|
-| `setNodes` | `(nodes: INode[]): void` | Set workflow nodes |
-| `getNode` | `(nodeName: string): INode \| null` | Get node by name |
-| `getNodes` | `(nodeNames: string[]): INode[]` | Get multiple nodes |
-| `getTriggerNodes` | `(): INode[]` | Get all trigger nodes |
-| `getPollNodes` | `(): INode[]` | Get all poll nodes |
-
-#### Connection Methods
-| Method | Signature | Purpose |
-|--------|-----------|---------|
-| `setConnections` | `(connections: IConnections): void` | Set node connections |
-
-#### Data Methods
-| Method | Signature | Purpose |
-|--------|-----------|---------|
-| `getStaticData` | `(type: 'global' \| 'node', node?: INode): IDataObject` | Get persisted data |
-| `setPinData` | `(pinData: IPinData \| undefined): void` | Set pinned data |
-| `getPinDataOfNode` | `(nodeName: string): INodeExecutionData[] \| undefined` | Get node's pinned data |
-
 ---
 
-### NodeHelpers
-**File:** `packages/workflow/src/node-helpers.ts`
+## Helper Functions
+<!-- chunk: 02-helpers | keywords: helpers, binary, request -->
 
-#### Key Functions
-<!-- chunk: 02-node-helpers | keywords: helpers, node, utilities -->
+### Request Helpers
 
-| Function | Signature | Purpose |
-|----------|-----------|---------|
-| `displayParameter` | `(parameter: INodeProperties, nodeValues: INodeParameters): boolean` | Check if parameter should display |
-| `getNodeParameters` | `(properties: INodeProperties[], values: INodeParameters, returnDefaults: boolean): INodeParameters \| null` | Get resolved parameters |
-| `getNodeParametersIssues` | `(nodeType: INodeTypeDescription, nodeValues: INodeParameters): INodeIssues` | Validate node parameters |
-| `isTriggerNode` | `(nodeTypeData: INodeTypeDescription): boolean` | Check if node is trigger |
-| `isSubNodeType` | `(typeDescription: INodeTypeDescription): boolean` | Check if sub-node type |
-| `getNodeWebhookPath` | `(node: INode, mode: string): string` | Get webhook path |
-| `getNodeWebhookUrl` | `(baseUrl: string, node: INode, mode: string): string` | Get full webhook URL |
-
----
-
-### Expression Class
-**File:** `packages/workflow/src/expression.ts`
-
-#### `resolveSimpleParameterValue`
 ```typescript
-resolveSimpleParameterValue(
-  parameterValue: NodeParameterValue,
-  siblingParameters: INodeParameters,
-  runExecutionData: IRunExecutionData | null,
-  runIndex: number,
-  itemIndex: number,
-  activeNodeName: string,
-  connectionInputData: INodeExecutionData[],
-  mode: WorkflowExecuteMode,
-  additionalKeys: IWorkflowDataProxyAdditionalKeys
-): NodeParameterValue
+httpRequest(requestOptions: IHttpRequestOptions): Promise<any>
+httpRequestWithAuthentication(credType: string, options: IHttpRequestOptions): Promise<any>
+requestWithAuthenticationPaginated(options: IRequestOptions, itemIndex: number, pagination: PaginationOptions): Promise<any[]>
 ```
-Resolves parameter value, executing expressions like `{{ $json.field }}`.
 
-#### Static Methods
-| Method | Purpose |
-|--------|---------|
-| `initializeGlobalContext(data: IDataObject)` | Initialize expression global context |
-| `resolveWithoutWorkflow(expression: string, data: IDataObject)` | Evaluate expression without workflow |
+### Binary Helpers
 
-→ Data Models: [[03_DATA_MODELS]]
-→ Examples: [[07_EXAMPLES]]
+```typescript
+binaryToBuffer(body: Buffer | Readable): Promise<Buffer>
+binaryToString(body: Buffer | Readable, encoding?: BufferEncoding): Promise<string>
+getBinaryStream(binaryDataId: string): Promise<Readable>
+prepareBinaryData(data: Buffer | Readable, filePath?: string, mimeType?: string): Promise<IBinaryData>
+getBinaryDataBuffer(itemIndex: number, propertyName: string): Promise<Buffer>
+```
+
+### File System Helpers
+
+```typescript
+createReadStream(path: string): Readable
+getStoragePath(): string
+writeContentToFile(path: string, content: string | Buffer, flag?: string): Promise<void>
+```
+
+---
+
+## Type Statistics
+
+| Category | Count |
+|----------|-------|
+| API Endpoints | 30+ |
+| Services | 10+ |
+| Database Entities | 15 |
+| Core Interfaces | 50+ |
+| Execution Types | 20+ |
+| Connection Types | 13 |
+| **Total Types** | **100+** |
+
+---
+
+*Source: packages/cli/src/, packages/@n8n/db/src/, packages/workflow/src/*

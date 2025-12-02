@@ -1,386 +1,368 @@
 # 08_QUICK_REF.md
 <!-- repo: n8n | version: 1.122.0 | generated: 2025-12-02 -->
-<!-- tags: reference, cheatsheet, index, quick, lookup -->
+<!-- tags: index, quick-reference, commands, glossary, prompts -->
 
 ## Contents
-- [Command Cheatsheet](#command-cheatsheet)
-- [Function Index](#function-index)
-- [Class Index](#class-index)
-- [Entity Index](#entity-index)
-- [Environment Variable Index](#environment-variable-index)
-- [Error Code Index](#error-code-index)
-- [API Endpoint Index](#api-endpoint-index)
-- [File Purpose Index](#file-purpose-index)
-- [Glossary](#glossary)
+- [KB Index](#kb-index)
+- [Quick Command Reference](#quick-command-reference)
+- [Common Tasks](#common-tasks)
+- [Node Type Quick Reference](#node-type-quick-reference)
+- [Expression Cheatsheet](#expression-cheatsheet)
+- [Environment Variables](#environment-variables)
+- [System Prompts](#system-prompts)
 
 ---
 
-## Command Cheatsheet
-<!-- chunk: 08-commands | keywords: commands, cli, pnpm | source: package.json -->
+## KB Index
+<!-- chunk: 08-index | keywords: index, files, contents -->
 
-### Development Commands
+### File Map
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm install` | Install dependencies |
-| `pnpm build > build.log 2>&1` | Build all packages |
-| `pnpm dev` | Start development server |
-| `pnpm dev:be` | Start backend only |
-| `pnpm dev:fe` | Start frontend only |
-| `pnpm dev:ai` | Start AI development |
+| File | Contents |
+|------|----------|
+| `01_PLATFORM_OVERVIEW.md` | Architecture, packages, config, debugging |
+| `02_CORE_API.md` | REST API, controllers, services, entities, types |
+| `03_PATTERNS_EXAMPLES.md` | Dev patterns, error classes, stores, examples |
+| `04_NODE_REFERENCE.md` | All 649 nodes with JSON examples |
+| `05_CREDENTIALS.md` | All 389 credential types |
+| `06_WORKFLOW_BUILDER.md` | JSON schema, expressions, templates |
+| `07_ADVANCED_PATTERNS.md` | Binary data, HTTP, errors, pagination |
+| `08_QUICK_REF.md` | This file - index and quick reference |
 
-### Quality Commands
+### Cross-Reference Guide
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm typecheck` | Run TypeScript checks |
-| `pnpm lint` | Run linter |
-| `pnpm lint:fix` | Fix lint issues |
-| `pnpm format` | Format code |
-
-### Testing Commands
-
-| Command | Purpose |
-|---------|---------|
-| `pnpm test` | Run all tests |
-| `pnpm test:affected` | Test changed files |
-| `pnpm test:ci` | CI test runner |
-| `cd packages/cli && pnpm test` | Package-specific tests |
-
-### n8n CLI Commands
-
-| Command | Purpose |
-|---------|---------|
-| `n8n start` | Start server |
-| `n8n start --tunnel` | Start with tunnel |
-| `n8n webhook` | Webhook-only server |
-| `n8n worker` | Queue worker |
-| `n8n execute --id=<id>` | Execute workflow |
-| `n8n export:workflow --id=<id>` | Export workflow |
+| Looking For | See |
+|-------------|-----|
+| Architecture | `01_PLATFORM_OVERVIEW.md` |
+| API Endpoints | `02_CORE_API.md` |
+| Database Entities | `02_CORE_API.md` |
+| Development Patterns | `03_PATTERNS_EXAMPLES.md` |
+| Error Classes | `03_PATTERNS_EXAMPLES.md` |
+| Frontend Stores | `03_PATTERNS_EXAMPLES.md` |
+| Node Types | `04_NODE_REFERENCE.md` |
+| Credentials | `05_CREDENTIALS.md` |
+| Workflow JSON | `06_WORKFLOW_BUILDER.md` |
+| Expressions | `06_WORKFLOW_BUILDER.md` |
+| Templates | `06_WORKFLOW_BUILDER.md` |
+| File/Binary | `07_ADVANCED_PATTERNS.md` |
+| HTTP Request | `07_ADVANCED_PATTERNS.md` |
+| Error Handling | `07_ADVANCED_PATTERNS.md` |
+| Pagination | `07_ADVANCED_PATTERNS.md` |
 
 ---
 
-## Function Index
-<!-- chunk: 08-functions | keywords: function, method, api | source: analysis -->
+## Quick Command Reference
+<!-- chunk: 08-commands | keywords: commands, pnpm, cli -->
 
-### Core Functions
+### Development
+```bash
+pnpm install                    # Install dependencies
+pnpm build > build.log 2>&1     # Build all packages
+pnpm dev                        # Start dev server (http://localhost:5678)
+pnpm dev:ai                     # Start with AI features
+pnpm typecheck                  # TypeScript checks
+pnpm lint                       # Run linter
+pnpm test                       # Run all tests
+```
 
-| Function | Module | Link |
-|----------|--------|------|
-| `WorkflowExecute.run` | core | [[02_CORE_API#workflowexecute]] |
-| `WorkflowExecute.runPartialWorkflow2` | core | [[02_CORE_API#workflowexecute]] |
-| `Workflow.getNode` | workflow | [[02_CORE_API#workflow-class]] |
-| `Workflow.getTriggerNodes` | workflow | [[02_CORE_API#workflow-class]] |
-| `Workflow.getStaticData` | workflow | [[02_CORE_API#workflow-class]] |
-| `Expression.resolveSimpleParameterValue` | workflow | [[02_CORE_API#expression-class]] |
+### Package-Specific
+```bash
+cd packages/cli && pnpm test    # Test CLI package
+cd packages/editor-ui && pnpm lint   # Lint frontend
+cd packages/workflow && pnpm typecheck  # Check types
+```
 
-### Node Helpers
+### Git
+```bash
+git checkout -b feat/my-feature  # New branch
+git add -p                       # Interactive staging
+git commit -m "feat: description"  # Commit
+git push -u origin HEAD          # Push branch
+```
 
-| Function | Module | Link |
-|----------|--------|------|
-| `displayParameter` | node-helpers | [[02_CORE_API#nodehelpers]] |
-| `getNodeParameters` | node-helpers | [[02_CORE_API#nodehelpers]] |
-| `getNodeParametersIssues` | node-helpers | [[02_CORE_API#nodehelpers]] |
-| `isTriggerNode` | node-helpers | [[02_CORE_API#nodehelpers]] |
-| `getNodeWebhookUrl` | node-helpers | [[02_CORE_API#nodehelpers]] |
-
-### Service Methods
-
-| Function | Service | Link |
-|----------|---------|------|
-| `UserService.update` | cli | [[02_CORE_API#userservice]] |
-| `UserService.toPublic` | cli | [[02_CORE_API#userservice]] |
-| `CredentialsService.getMany` | cli | [[02_CORE_API#credentialsservice]] |
-| `CredentialsService.test` | cli | [[02_CORE_API#credentialsservice]] |
-| `CredentialsService.decrypt` | cli | [[02_CORE_API#credentialsservice]] |
-
----
-
-## Class Index
-<!-- chunk: 08-classes | keywords: class, type, interface | source: analysis -->
-
-### Core Classes
-
-| Class | Package | Link |
-|-------|---------|------|
-| `WorkflowExecute` | core | [[02_CORE_API#workflowexecute]] |
-| `ExecuteContext` | core | [[02_CORE_API#executecontext]] |
-| `TriggerContext` | core | [[02_CORE_API#triggercontext]] |
-| `PollContext` | core | [[02_CORE_API#pollcontext]] |
-| `Workflow` | workflow | [[02_CORE_API#workflow-class]] |
-| `Expression` | workflow | [[02_CORE_API#expression-class]] |
-
-### Error Classes
-
-| Class | Status | Link |
-|-------|--------|------|
-| `BadRequestError` | 400 | [[06_DEBUG#http-response-errors]] |
-| `AuthError` | 401 | [[06_DEBUG#http-response-errors]] |
-| `ForbiddenError` | 403 | [[06_DEBUG#http-response-errors]] |
-| `NotFoundError` | 404 | [[06_DEBUG#http-response-errors]] |
-| `InternalServerError` | 500 | [[06_DEBUG#http-response-errors]] |
-| `UserError` | - | [[06_DEBUG#execution-errors]] |
-| `NodeOperationError` | - | [[06_DEBUG#execution-errors]] |
+### n8n CLI
+```bash
+n8n start                        # Start n8n
+n8n export:workflow --id=<id>    # Export workflow
+n8n import:workflow --input=<file>  # Import workflow
+n8n execute --id=<id>            # Execute workflow
+```
 
 ---
 
-## Entity Index
-<!-- chunk: 08-entities | keywords: entity, database, table | source: analysis -->
+## Common Tasks
+<!-- chunk: 08-tasks | keywords: tasks, howto -->
 
-| Entity | Table | Link |
-|--------|-------|------|
-| `WorkflowEntity` | workflow_entity | [[03_DATA_MODELS#workflowentity]] |
-| `ExecutionEntity` | execution_entity | [[03_DATA_MODELS#executionentity]] |
-| `CredentialsEntity` | credentials_entity | [[03_DATA_MODELS#credentialsentity]] |
-| `User` | user | [[03_DATA_MODELS#user]] |
-| `Project` | project | [[03_DATA_MODELS#project]] |
-| `TagEntity` | tag_entity | [[03_DATA_MODELS#tagentity]] |
-| `Folder` | folder | [[03_DATA_MODELS#folder]] |
-| `SharedWorkflow` | shared_workflow | [[03_DATA_MODELS#sharedworkflow]] |
-| `SharedCredentials` | shared_credentials | [[03_DATA_MODELS#sharedcredentials]] |
-| `ExecutionData` | execution_data | [[03_DATA_MODELS#executiondata]] |
-| `WebhookEntity` | webhook_entity | [[03_DATA_MODELS#webhookentity]] |
-| `ApiKey` | api_key | [[03_DATA_MODELS#apikey]] |
-| `Role` | role | [[03_DATA_MODELS#role--scope]] |
-| `WorkflowHistory` | workflow_history | [[03_DATA_MODELS#workflowhistory]] |
+### Create New Node
+1. Create `packages/nodes-base/nodes/MyNode/MyNode.node.ts`
+2. Implement `INodeType` interface
+3. Add to `package.json`
+4. Run `pnpm build`
+
+### Create New Controller
+1. Create `packages/cli/src/controllers/my.controller.ts`
+2. Use `@RestController` decorator
+3. Register in module
+4. Add types to `@n8n/api-types`
+
+### Create New Store
+1. Create `packages/frontend/editor-ui/src/app/stores/my.store.ts`
+2. Use `defineStore` from Pinia
+3. Export state, getters, actions
+
+### Add Environment Variable
+1. Add to `packages/@n8n/config/src/config.ts`
+2. Use Zod for validation
+3. Document in `.env.example`
 
 ---
 
-## Environment Variable Index
-<!-- chunk: 08-env | keywords: environment, variable, config | source: analysis -->
+## Node Type Quick Reference
+<!-- chunk: 08-nodes-quick | keywords: nodes, types, quick -->
 
-### Server
+### Triggers
+| Type | Description |
+|------|-------------|
+| `n8n-nodes-base.manualTrigger` | Manual execution |
+| `n8n-nodes-base.webhook` | HTTP endpoint |
+| `n8n-nodes-base.scheduleTrigger` | Cron/interval |
+| `@n8n/n8n-nodes-langchain.chatTrigger` | AI chat |
 
-| Variable | Default | Link |
-|----------|---------|------|
-| `N8N_HOST` | localhost | [[05_CONFIG#server-settings]] |
-| `N8N_PORT` | 5678 | [[05_CONFIG#server-settings]] |
-| `N8N_PROTOCOL` | http | [[05_CONFIG#server-settings]] |
-| `N8N_ENCRYPTION_KEY` | - | [[05_CONFIG#general-settings]] |
+### Flow Control
+| Type | Description |
+|------|-------------|
+| `n8n-nodes-base.if` | Conditional (2 outputs) |
+| `n8n-nodes-base.switch` | Multi-way routing |
+| `n8n-nodes-base.merge` | Combine branches |
+| `n8n-nodes-base.splitInBatches` | Batch processing |
+
+### Data Transform
+| Type | Description |
+|------|-------------|
+| `n8n-nodes-base.set` | Edit/add fields |
+| `n8n-nodes-base.code` | Custom JS/Python |
+| `n8n-nodes-base.filter` | Filter items |
+| `n8n-nodes-base.aggregate` | Group data |
+
+### Integration
+| Type | Description |
+|------|-------------|
+| `n8n-nodes-base.httpRequest` | API calls |
+| `n8n-nodes-base.slack` | Slack messaging |
+| `n8n-nodes-base.googleSheets` | Spreadsheets |
+| `n8n-nodes-base.postgres` | PostgreSQL |
+
+### AI/LangChain
+| Type | Description |
+|------|-------------|
+| `@n8n/n8n-nodes-langchain.agent` | AI agent |
+| `@n8n/n8n-nodes-langchain.lmChatOpenAi` | OpenAI |
+| `@n8n/n8n-nodes-langchain.memoryBufferWindow` | Memory |
+| `@n8n/n8n-nodes-langchain.toolCalculator` | Tool |
+
+---
+
+## Expression Cheatsheet
+<!-- chunk: 08-expressions | keywords: expressions, cheatsheet -->
+
+### Variables
+```javascript
+$json                    // Current item
+$json.field              // Field access
+$input.first()           // First input
+$input.all()             // All items
+$('NodeName').item.json  // Other node
+$now                     // Current time
+$env.VAR                 // Environment
+$execution.id            // Execution ID
+```
+
+### String Methods
+```javascript
+.toUpperCase()           // UPPERCASE
+.toLowerCase()           // lowercase
+.isEmail()               // Validate email
+.extractEmail()          // Extract email
+.base64Encode()          // Encode
+.hash('sha256')          // Hash
+```
+
+### Array Methods
+```javascript
+.first()                 // First item
+.last()                  // Last item
+.sum()                   // Sum numbers
+.unique()                // Dedupe
+.pluck('field')          // Extract field
+```
+
+### Date Methods
+```javascript
+$now.toISO()                    // ISO string
+$now.toFormat('yyyy-MM-dd')     // Format
+$now.plus(7, 'days')            // Add time
+$now.minus(1, 'month')          // Subtract
+$now.startOf('day')             // Start of day
+```
+
+### Conditional
+```javascript
+condition ? ifTrue : ifFalse
+$json.value ?? 'default'
+$json.user?.email
+```
+
+---
+
+## Environment Variables
+<!-- chunk: 08-env | keywords: environment, config -->
+
+### Core
+```bash
+N8N_HOST=localhost
+N8N_PORT=5678
+N8N_PROTOCOL=http
+N8N_ENCRYPTION_KEY=<key>
+```
 
 ### Database
-
-| Variable | Default | Link |
-|----------|---------|------|
-| `DB_TYPE` | sqlite | [[05_CONFIG#database-type]] |
-| `DB_POSTGRESDB_HOST` | localhost | [[05_CONFIG#postgresql-configuration]] |
-| `DB_POSTGRESDB_DATABASE` | n8n | [[05_CONFIG#postgresql-configuration]] |
+```bash
+DB_TYPE=sqlite|postgresdb|mysqldb
+DB_POSTGRESDB_HOST=localhost
+DB_POSTGRESDB_PORT=5432
+DB_POSTGRESDB_DATABASE=n8n
+DB_POSTGRESDB_USER=n8n
+DB_POSTGRESDB_PASSWORD=<password>
+```
 
 ### Execution
-
-| Variable | Default | Link |
-|----------|---------|------|
-| `EXECUTIONS_MODE` | regular | [[05_CONFIG#execution-mode]] |
-| `EXECUTIONS_TIMEOUT` | -1 | [[05_CONFIG#timeouts]] |
-| `EXECUTIONS_DATA_PRUNE` | true | [[05_CONFIG#data-retention]] |
+```bash
+EXECUTIONS_MODE=regular|queue
+EXECUTIONS_TIMEOUT=3600
+EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+```
 
 ### Logging
-
-| Variable | Default | Link |
-|----------|---------|------|
-| `N8N_LOG_LEVEL` | info | [[05_CONFIG#log-settings]] |
-| `N8N_LOG_OUTPUT` | console | [[05_CONFIG#log-settings]] |
-| `N8N_LOG_SCOPES` | - | [[05_CONFIG#log-scopes]] |
-
-### Queue/Redis
-
-| Variable | Default | Link |
-|----------|---------|------|
-| `QUEUE_BULL_REDIS_HOST` | localhost | [[05_CONFIG#redis-configuration]] |
-| `QUEUE_BULL_REDIS_PORT` | 6379 | [[05_CONFIG#redis-configuration]] |
+```bash
+N8N_LOG_LEVEL=info|debug|warn|error
+N8N_LOG_OUTPUT=console|file
+```
 
 ---
 
-## Error Code Index
-<!-- chunk: 08-errors | keywords: error, code, status | source: analysis -->
+## System Prompts
+<!-- chunk: 08-prompts | keywords: prompts, ai, system -->
 
-| Code | Error | Link |
-|------|-------|------|
-| 400 | BadRequestError | [[06_DEBUG#http-response-errors]] |
-| 401 | AuthError, UnauthenticatedError | [[06_DEBUG#http-response-errors]] |
-| 403 | ForbiddenError, InvalidMfaCodeError | [[06_DEBUG#http-response-errors]] |
-| 404 | NotFoundError, WebhookNotFoundError | [[06_DEBUG#http-response-errors]] |
-| 409 | ConflictError | [[06_DEBUG#http-response-errors]] |
-| 413 | ContentTooLargeError | [[06_DEBUG#http-response-errors]] |
-| 429 | TooManyRequestsError | [[06_DEBUG#http-response-errors]] |
-| 500 | InternalServerError | [[06_DEBUG#http-response-errors]] |
-| 503 | ServiceUnavailableError | [[06_DEBUG#http-response-errors]] |
+### n8n Expert System Prompt
+
+```markdown
+You are an expert n8n developer with deep knowledge of the n8n workflow
+automation platform (version 1.122.0).
+
+## Technology Stack
+- Backend: Node.js 22+, TypeScript 5.9, Express 5.0
+- Frontend: Vue 3.5, Vite, Pinia
+- Database: TypeORM with SQLite/PostgreSQL/MySQL
+- Build: pnpm workspaces + Turbo
+- Testing: Jest, Vitest, Playwright
+
+## Key Patterns
+- Use `@Service()` for dependency injection
+- Use `@RestController()` for HTTP endpoints
+- Use `defineStore()` for frontend state
+- Never use `any` type or `ApplicationError`
+
+## Error Classes
+- UserError: User-triggered errors
+- OperationalError: Transient issues
+- UnexpectedError: Programming errors
+- NodeApiError: External API errors
+
+## When Helping
+1. Reference KB files for detailed info
+2. Provide file:line references
+3. Use correct n8n patterns
+4. Check types in workflow package
+5. Suggest pnpm commands
+```
+
+### Workflow Builder System Prompt
+
+```markdown
+You are an expert n8n workflow builder specializing in creating valid
+n8n workflow JSON files that can be imported directly into n8n.
+
+## Workflow JSON Structure
+{
+  "name": "Workflow Name",
+  "nodes": [],
+  "connections": {},
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
+
+## Node Structure
+{
+  "id": "unique-uuid",
+  "name": "Node Display Name",
+  "type": "n8n-nodes-base.nodetype",
+  "typeVersion": 1.0,
+  "position": [250, 300],
+  "parameters": {}
+}
+
+## Connection Structure
+{
+  "SourceNode": {
+    "main": [[{ "node": "TargetNode", "type": "main", "index": 0 }]]
+  }
+}
+
+## AI Connections
+- ai_languageModel: LLM provider (max 1)
+- ai_memory: Conversation history (max 1)
+- ai_tool: Agent tools (unlimited)
+- ai_vectorStore: Vector database (max 1)
+
+## Validation Checklist
+- All nodes have unique id and name
+- All nodes have correct type and typeVersion
+- Positions don't overlap
+- All connections reference existing nodes
+- Expressions use ={{ }} syntax
+```
 
 ---
 
-## API Endpoint Index
-<!-- chunk: 08-endpoints | keywords: api, endpoint, rest | source: analysis -->
+## Statistics Summary
 
-### Authentication
-
-| Method | Path | Link |
-|--------|------|------|
-| POST | `/login` | [[02_CORE_API#authentication-controller]] |
-| GET | `/login` | [[02_CORE_API#authentication-controller]] |
-| POST | `/logout` | [[02_CORE_API#authentication-controller]] |
-
-### Users
-
-| Method | Path | Link |
-|--------|------|------|
-| GET | `/users` | [[02_CORE_API#users-controller]] |
-| DELETE | `/users/:id` | [[02_CORE_API#users-controller]] |
-| PATCH | `/users/:id/role` | [[02_CORE_API#users-controller]] |
-
-### Credentials
-
-| Method | Path | Link |
-|--------|------|------|
-| GET | `/credentials` | [[02_CORE_API#credentials-controller]] |
-| POST | `/credentials` | [[02_CORE_API#credentials-controller]] |
-| POST | `/credentials/test` | [[02_CORE_API#credentials-controller]] |
-| DELETE | `/credentials/:id` | [[02_CORE_API#credentials-controller]] |
-
-### Workflows
-
-| Method | Path | Link |
-|--------|------|------|
-| GET | `/workflows` | [[02_CORE_API#workflows-controller]] |
-| POST | `/workflows` | [[02_CORE_API#workflows-controller]] |
-| PATCH | `/workflows/:id` | [[02_CORE_API#workflows-controller]] |
-| POST | `/workflows/:id/run` | [[02_CORE_API#workflows-controller]] |
-
-### AI
-
-| Method | Path | Link |
-|--------|------|------|
-| POST | `/ai/build` | [[02_CORE_API#ai-controller]] |
-| POST | `/ai/chat` | [[02_CORE_API#ai-controller]] |
-| POST | `/ai/ask` | [[02_CORE_API#ai-controller]] |
-
-### Health
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| GET | `/healthz` | Liveness check |
-| GET | `/healthz/readiness` | Readiness check |
-
----
-
-## File Purpose Index
-<!-- chunk: 08-files | keywords: file, path, purpose | source: analysis -->
-
-### Entry Points
-
-| File | Purpose |
-|------|---------|
-| `packages/cli/bin/n8n` | CLI entry point |
-| `packages/frontend/editor-ui/src/main.ts` | Frontend entry |
-
-### Core Files
-
-| File | Purpose |
-|------|---------|
-| `packages/core/src/execution-engine/workflow-execute.ts` | Execution orchestrator |
-| `packages/workflow/src/workflow.ts` | Workflow class |
-| `packages/workflow/src/interfaces.ts` | Core interfaces |
-
-### Configuration
-
-| File | Purpose |
-|------|---------|
-| `packages/@n8n/config/src/index.ts` | Configuration root |
-| `turbo.json` | Build orchestration |
-| `pnpm-workspace.yaml` | Workspace config |
-
-### Frontend
-
-| File | Purpose |
-|------|---------|
-| `packages/frontend/editor-ui/src/app/stores/workflows.store.ts` | Workflow state |
-| `packages/frontend/editor-ui/src/app/stores/ui.store.ts` | UI state |
+| Category | Count |
+|----------|-------|
+| Total Nodes | 649 |
+| Credential Types | 389 |
+| Error Classes | 135+ |
+| Frontend Stores | 19 |
+| Connection Types | 13 |
+| API Controllers | 29 |
+| Database Entities | 15 |
 
 ---
 
 ## Glossary
-<!-- chunk: 08-glossary | keywords: glossary, terms, definitions | source: analysis -->
 
 | Term | Definition |
 |------|------------|
-| **Workflow** | Automated process defined by nodes and connections |
-| **Node** | Single step in a workflow (trigger, action, etc.) |
-| **Trigger Node** | Node that starts workflow execution |
-| **Poll Node** | Node that periodically checks for new data |
+| **Node** | Building block of a workflow |
+| **Trigger** | Node that starts workflow execution |
+| **Workflow** | Collection of connected nodes |
 | **Execution** | Single run of a workflow |
-| **Credential** | Authentication data for external services |
-| **Project** | Container for workflows and credentials |
-| **Pinned Data** | Fixed test data for nodes |
-| **Expression** | Dynamic value using `{{ }}` syntax |
-| **Webhook** | HTTP endpoint for triggering workflows |
-| **Task Runner** | Isolated environment for code execution |
-| **Static Data** | Data persisted across workflow executions |
-| **RBAC** | Role-Based Access Control |
-| **Pinia** | Vue.js state management library |
-| **TypeORM** | Database ORM used in n8n |
-| **Turbo** | Build system for monorepos |
+| **Credential** | Stored authentication info |
+| **Expression** | Dynamic value using `={{ }}` syntax |
+| **Binary Data** | File/image data attached to items |
+| **Pinned Data** | Test data stored with node |
+| **Webhook** | HTTP endpoint trigger |
+| **Agent** | AI node with tools and memory |
 
 ---
 
-## Quick Links
-
-### Platform Development KB
-| Topic | Link |
-|-------|------|
-| Architecture Overview | [[01_ARCHITECTURE]] |
-| API Reference | [[02_CORE_API]] |
-| Data Models | [[03_DATA_MODELS]] |
-| Coding Patterns | [[04_PATTERNS]] |
-| Configuration | [[05_CONFIG]] |
-| Debugging | [[06_DEBUG]] |
-| Examples | [[07_EXAMPLES]] |
-| Error Reference (135+ errors) | [[09_ERROR_REFERENCE]] |
-| Frontend Stores (19 stores) | [[10_FRONTEND_STORES]] |
-| Workflow Types (100+ types) | [[11_WORKFLOW_TYPES]] |
-
-### Workflow Builder KB
-| Topic | Link |
-|-------|------|
-| Workflow JSON Schema | [[12_WORKFLOW_JSON_SCHEMA]] |
-| Expression Syntax Guide | [[13_EXPRESSION_GUIDE]] |
-| Workflow Templates | [[14_WORKFLOW_TEMPLATES]] |
-| Node Reference (649 nodes) | [[15_NODE_REFERENCE]] |
-| Credentials Reference (389 types) | [[16_CREDENTIALS_REFERENCE]] |
-| Connection Patterns | [[17_CONNECTION_PATTERNS]] |
-| Binary Data & Files | [[18_BINARY_AND_FILES]] |
-| Pagination Patterns | [[19_PAGINATION_PATTERNS]] |
-| Error Handling | [[20_ERROR_HANDLING]] |
-| Sub-workflows | [[21_SUBWORKFLOWS]] |
-| Advanced HTTP Patterns | [[22_ADVANCED_HTTP]] |
-| AI/LangChain Nodes (118 nodes) | [[23_ALL_AI_NODES]] |
-| Operations Reference | [[24_OPERATIONS_REFERENCE]] |
-
-### System Prompts
-| Prompt | Purpose |
-|--------|---------|
-| [[N8N_EXPERT_SYSTEM_PROMPT]] | n8n platform development assistant |
-| [[WORKFLOW_BUILDER_SYSTEM_PROMPT]] | Workflow JSON creation assistant |
-
----
-
-## KB Statistics
-
-| Metric | Count |
-|--------|-------|
-| Total KB Files | 26 |
-| Platform Development Files | 11 |
-| Workflow Builder Files | 13 |
-| System Prompt Files | 2 |
-| Error Classes Documented | 135+ |
-| Total Nodes Documented | 649 |
-| - nodes-base | 531 |
-| - nodes-langchain (AI) | 118 |
-| Credential Types | 389 |
-| - OAuth2 Types | 102 |
-| - API Key Types | 247 |
-| - Other Auth Types | 40 |
-| Workflow Types | 100+ |
-| Pinia Stores Documented | 19 |
-| Store Actions Documented | 400+ |
-| Connection Types | 13 |
-| Operations Documented | 200+ |
-| RAG Chunks | 1200+ |
+*Source: n8n repository v1.122.0*
