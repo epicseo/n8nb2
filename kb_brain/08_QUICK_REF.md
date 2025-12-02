@@ -323,6 +323,7 @@
 
 ## Quick Links
 
+### Platform Development KB
 | Topic | Link |
 |-------|------|
 | Architecture Overview | [[01_ARCHITECTURE]] |
@@ -336,16 +337,37 @@
 | Frontend Stores (19 stores) | [[10_FRONTEND_STORES]] |
 | Workflow Types (100+ types) | [[11_WORKFLOW_TYPES]] |
 
+### Workflow Builder KB
+| Topic | Link |
+|-------|------|
+| Workflow JSON Schema | [[12_WORKFLOW_JSON_SCHEMA]] |
+| Expression Syntax Guide | [[13_EXPRESSION_GUIDE]] |
+| Workflow Templates | [[14_WORKFLOW_TEMPLATES]] |
+| Node Reference (503 nodes) | [[15_NODE_REFERENCE]] |
+| Credentials Reference (389 types) | [[16_CREDENTIALS_REFERENCE]] |
+| Connection Patterns | [[17_CONNECTION_PATTERNS]] |
+
+### System Prompts
+| Prompt | Purpose |
+|--------|---------|
+| [[N8N_EXPERT_SYSTEM_PROMPT]] | n8n platform development assistant |
+| [[WORKFLOW_BUILDER_SYSTEM_PROMPT]] | Workflow JSON creation assistant |
+
 ---
 
 ## KB Statistics
 
 | Metric | Count |
 |--------|-------|
-| Total KB Files | 11 |
+| Total KB Files | 19 |
+| Platform Development Files | 11 |
+| Workflow Builder Files | 6 |
+| System Prompt Files | 2 |
 | Error Classes Documented | 135+ |
-| API Types Documented | 200+ |
-| Workflow Types Documented | 100+ |
+| Nodes Documented | 503 |
+| Credential Types | 389 |
+| Workflow Types | 100+ |
 | Pinia Stores Documented | 19 |
 | Store Actions Documented | 400+ |
-| RAG Chunks | 500+ |
+| Connection Types | 13 |
+| RAG Chunks | 800+ |
