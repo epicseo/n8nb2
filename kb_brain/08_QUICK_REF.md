@@ -1,5 +1,5 @@
 # 08_QUICK_REF.md
-<!-- repo: n8n | branch: claude/github-to-kb-converter-01JAurUearApTk4RAu9NPFAg | commit: 3c0e809e | generated: 2025-11-28 -->
+<!-- repo: n8n | version: 1.122.0 | generated: 2025-12-02 -->
 <!-- tags: reference, cheatsheet, index, quick, lookup -->
 
 ## Contents
@@ -343,9 +343,16 @@
 | Workflow JSON Schema | [[12_WORKFLOW_JSON_SCHEMA]] |
 | Expression Syntax Guide | [[13_EXPRESSION_GUIDE]] |
 | Workflow Templates | [[14_WORKFLOW_TEMPLATES]] |
-| Node Reference (503 nodes) | [[15_NODE_REFERENCE]] |
+| Node Reference (649 nodes) | [[15_NODE_REFERENCE]] |
 | Credentials Reference (389 types) | [[16_CREDENTIALS_REFERENCE]] |
 | Connection Patterns | [[17_CONNECTION_PATTERNS]] |
+| Binary Data & Files | [[18_BINARY_AND_FILES]] |
+| Pagination Patterns | [[19_PAGINATION_PATTERNS]] |
+| Error Handling | [[20_ERROR_HANDLING]] |
+| Sub-workflows | [[21_SUBWORKFLOWS]] |
+| Advanced HTTP Patterns | [[22_ADVANCED_HTTP]] |
+| AI/LangChain Nodes (118 nodes) | [[23_ALL_AI_NODES]] |
+| Operations Reference | [[24_OPERATIONS_REFERENCE]] |
 
 ### System Prompts
 | Prompt | Purpose |
@@ -359,15 +366,21 @@
 
 | Metric | Count |
 |--------|-------|
-| Total KB Files | 19 |
+| Total KB Files | 26 |
 | Platform Development Files | 11 |
-| Workflow Builder Files | 6 |
+| Workflow Builder Files | 13 |
 | System Prompt Files | 2 |
 | Error Classes Documented | 135+ |
-| Nodes Documented | 503 |
+| Total Nodes Documented | 649 |
+| - nodes-base | 531 |
+| - nodes-langchain (AI) | 118 |
 | Credential Types | 389 |
+| - OAuth2 Types | 102 |
+| - API Key Types | 247 |
+| - Other Auth Types | 40 |
 | Workflow Types | 100+ |
 | Pinia Stores Documented | 19 |
 | Store Actions Documented | 400+ |
 | Connection Types | 13 |
-| RAG Chunks | 800+ |
+| Operations Documented | 200+ |
+| RAG Chunks | 1200+ |
